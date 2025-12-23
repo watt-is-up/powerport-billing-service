@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{74684635-DCBD-4F1E-9DFD-A771549B2481}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BillingService", "src\BillingService\BillingService.csproj", "{A8F13B32-9826-4531-9B2E-6B265A3C1CAF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D654F9E9-8D90-4F94-97F5-732F3D8128FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BillingService.Tests", "tests\BillingService.Tests\BillingService.Tests.csproj", "{50FF1612-F840-41CB-83B0-0D870AE5AAA4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A8F13B32-9826-4531-9B2E-6B265A3C1CAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8F13B32-9826-4531-9B2E-6B265A3C1CAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8F13B32-9826-4531-9B2E-6B265A3C1CAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8F13B32-9826-4531-9B2E-6B265A3C1CAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50FF1612-F840-41CB-83B0-0D870AE5AAA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50FF1612-F840-41CB-83B0-0D870AE5AAA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50FF1612-F840-41CB-83B0-0D870AE5AAA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50FF1612-F840-41CB-83B0-0D870AE5AAA4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A8F13B32-9826-4531-9B2E-6B265A3C1CAF} = {74684635-DCBD-4F1E-9DFD-A771549B2481}
+		{50FF1612-F840-41CB-83B0-0D870AE5AAA4} = {D654F9E9-8D90-4F94-97F5-732F3D8128FC}
+	EndGlobalSection
+EndGlobal

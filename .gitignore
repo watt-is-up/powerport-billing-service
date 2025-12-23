@@ -1,0 +1,19 @@
+# Build artifacts
+bin/
+obj/
+Debug/
+Release/
+
+# VS / Rider / OmniSharp
+*.user
+*.rsuser
+*.suo
+*.sln.docstates
+.idea/
+.vscode/
+
+# Auto-generated
+*.sourcelink.json
+
+# Mac
+.DS_Store
