@@ -1,0 +1,32 @@
+services:
+  billing-service:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "5001:8080"  # local dev port
+    depends_on:
+      - billing-db
+
+  billing-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: billing
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: billingdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - billing-data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"  # access Adminer at http://localhost:8080
+    depends_on:
+      - billing-db
+    environment:
+      - ADMINER_DESIGN=pepa-linha-dark
+
+volumes:
+  billing-data:

@@ -1,0 +1,25 @@
+services:
+  billing-service:
+    build:
+      context: ./src/BillingService
+    # ports:
+    #   - "5000:80"       # map container port to host
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    depends_on:
+      - billing-db
+
+  billing-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: billing
+      POSTGRES_DB: billingdb
+      # Do NOT put production password here
+      POSTGRES_PASSWORD: placeholder
+    ports:
+      - "5432:5432"
+    volumes:
+      - billing-data:/var/lib/postgresql/data
+
+volumes:
+  billing-data:
