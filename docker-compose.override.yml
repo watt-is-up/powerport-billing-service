@@ -1,10 +1,9 @@
-version: '3.8'
 services:
   billing-service:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
-      - "5001:80"  # local dev port
+      - "5001:8080"  # local dev port
     depends_on:
       - billing-db
 
