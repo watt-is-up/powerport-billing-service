@@ -10,8 +10,8 @@ namespace BillingService.Models
         public Guid UserId { get; set; } // Who is paying
         public Guid SessionId { get; set; } // Charging session reference
         public decimal Amount { get; set; } // Calculated amount
-        public DateTime StartTime { get; set; } // Session start
-        public DateTime EndTime { get; set; } // Session end
+        public DateTime SessionStarted { get; set; } // Session start
+        public DateTime SessionEnded { get; set; } // Session end
         public decimal EnergyConsumed { get; set; } // kWh consumed
         public decimal Rate { get; set; } // Price per kWh
         public PaymentStatus Status { get; set; } // Payment status: Pending, Paid, Failed
