@@ -12,3 +12,6 @@ ef-update-db:
 
 	@echo "Optional: stopping PostgreSQL container..."
 	@docker compose down
+
+test:
+	dotnet test ./tests/BillingService.Tests

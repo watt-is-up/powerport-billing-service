@@ -1,5 +1,6 @@
 using BillingService.Data;
 using BillingService.Models;
+using BillingService.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -7,11 +8,11 @@ namespace BillingService.Services;
 
 public class BillingManager
 {
-    private readonly BillingDbContext _dbContext;
+    private readonly IBillingRepository _repository;
 
-    public BillingManager(BillingDbContext dbContext)
+    public BillingManager(IBillingRepository repository)
     {
-        _dbContext = dbContext;
+        _repository = repository;
     }
 
     // Calculates amount and saves a payment
@@ -30,15 +31,12 @@ public class BillingManager
             Status = PaymentStatus.Pending
         };
 
-        _dbContext.Payments.Add(payment);
-        await _dbContext.SaveChangesAsync();
-
-        return payment;
+        return await _repository.CreatePaymentAsync(payment);
     }
 
     // Get all payments
     public async Task<List<Payment>> GetPaymentsAsync()
     {
-        return await _dbContext.Payments.ToListAsync();
+        return await _repository.GetPaymentsAsync();
     }
 }

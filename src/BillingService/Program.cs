@@ -1,18 +1,24 @@
 using BillingService.Data;
 using BillingService.Services;
+using BillingService.Services.Multitenancy;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load connection string from appsettings.json
-var connectionString = builder.Configuration.GetConnectionString("BillingDb");
+// [TODO]: replace with userServiceClient.GetAllProviders()
+builder.Services.AddSingleton<ITenantStore>(_ =>
+    new InMemoryTenantStore(TenantBootstrap.GetMockTenants()));
 
 // Register the DbContext with dependency injection
-builder.Services.AddDbContext<BillingDbContext>(options =>
-    options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<UserBillingDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("SharedBillingDb")));
 
 // Add controllers (for REST API)
 builder.Services.AddControllers();
+builder.Services.AddSingleton<BillingDbContextFactory>();
+builder.Services.AddSingleton<ITenantResolver, TenantResolver>();
+builder.Services.AddHttpContextAccessor();
 
 // Register Services
 builder.Services.AddScoped<BillingManager>();
@@ -23,6 +29,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseHttpsRedirection();
+app.UseTenantMiddleware();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
