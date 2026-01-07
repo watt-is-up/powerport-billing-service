@@ -1,38 +1,65 @@
 using BillingService.Data;
-using BillingService.Services;
+using BillingService.Services.Multitenancy;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load connection string from appsettings.json
-var connectionString = builder.Configuration.GetConnectionString("BillingDb");
+//
+// -------------------- Configure Services --------------------
+//
 
-// Register the DbContext with dependency injection
-builder.Services.AddDbContext<BillingDbContext>(options =>
-    options.UseNpgsql(connectionString));
+// 1. Register tenant store (In-memory for now; replace with user service API later)
+builder.Services.AddSingleton<ITenantStore>(_ =>
+    new InMemoryTenantStore(TenantBootstrap.GetMockTenants()));
 
-// Add controllers (for REST API)
+// 2. Register DbContexts
+
+// // Shared database for normal users
+// builder.Services.AddDbContext<UserBillingDbContext>(options =>
+//     options.UseSqlServer(
+//         builder.Configuration.GetConnectionString("SharedBillingDb")));
+
+// Tenant DbContexts will be created dynamically via BillingDbContextFactory
+builder.Services.AddSingleton<BillingDbContextFactory>();
+
+// 3. Multitenancy helpers
+builder.Services.AddSingleton<ITenantResolver, TenantResolver>(); // resolves tenant per request
+builder.Services.AddHttpContextAccessor();                        // required to access HttpContext in services
+builder.Services.AddScoped<IBillingContextAccessor, BillingContextAccessor>(); 
+// IBillingContextAccessor resolves the correct repository (User or Tenant) per request
+
+// 4. Add controllers (REST API)
 builder.Services.AddControllers();
 
-// Register Services
-builder.Services.AddScoped<BillingManager>();
-
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// 5. Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//
+// -------------------- Build App --------------------
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+//
+// -------------------- Configure Middleware --------------------
+//
+
+app.UseHttpsRedirection();
+
+// Multitenancy middleware
+// Determines the current tenant (or shared DB) and attaches the correct DbContext to HttpContext
+app.UseTenantMiddleware();
+
+//
+// -------------------- Configure Request Pipeline --------------------
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// Map controllers to endpoints
+app.MapControllers();
 
-app.MapControllers(); // Map API endpoints
-
+//
+// -------------------- Run App --------------------
 app.Run();

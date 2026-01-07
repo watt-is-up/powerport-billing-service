@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace BillingService.Migrations
+namespace BillingService.Migrations.User
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -20,11 +20,11 @@ namespace BillingService.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     SessionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Amount = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EnergyConsumed = table.Column<decimal>(type: "numeric", nullable: false),
-                    Rate = table.Column<decimal>(type: "numeric", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    SessionStarted = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    SessionEnded = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EnergyConsumed = table.Column<decimal>(type: "numeric(18,6)", precision: 18, scale: 6, nullable: false),
+                    Rate = table.Column<decimal>(type: "numeric(18,6)", precision: 18, scale: 6, nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)

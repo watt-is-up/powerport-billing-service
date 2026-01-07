@@ -9,10 +9,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace BillingService.Migrations
+namespace BillingService.Migrations.Tenant
 {
-    [DbContext(typeof(BillingDbContext))]
-    [Migration("20251223121530_InitialCreate")]
+    [DbContext(typeof(TenantBillingDbContext))]
+    [Migration("20260107210514_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -34,24 +34,27 @@ namespace BillingService.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<decimal>("EnergyConsumed")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 6)
+                        .HasColumnType("numeric(18,6)");
 
                     b.Property<decimal>("Rate")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 6)
+                        .HasColumnType("numeric(18,6)");
+
+                    b.Property<DateTime>("SessionEnded")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("SessionId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("StartTime")
+                    b.Property<DateTime>("SessionStarted")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Status")
