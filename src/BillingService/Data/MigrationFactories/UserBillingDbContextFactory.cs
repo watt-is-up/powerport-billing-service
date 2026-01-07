@@ -9,8 +9,8 @@ public class UserBillingDbContextFactory
     public UserBillingDbContext CreateDbContext(string[] args)
     {
         var options = new DbContextOptionsBuilder<UserBillingDbContext>()
-            .UseSqlServer(
-                "Server=(localdb)\\mssqllocaldb;Database=UserBillingDb;Trusted_Connection=True;")
+            .UseNpgsql(
+                "Host=localhost;Port=5432;Database=UserBillingDb;Username=postgres;Password=yourpassword")
             .Options;
 
         return new UserBillingDbContext(options);

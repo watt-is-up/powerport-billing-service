@@ -14,7 +14,7 @@ public class BillingDbContextFactory
     public TenantBillingDbContext CreateTenantDbContext(Tenant tenant)
     {
         var options = new DbContextOptionsBuilder<TenantBillingDbContext>()
-            .UseSqlServer(tenant.ConnectionString) // or UseNpgsql
+            .UseNpgsql(tenant.ConnectionString) // PostgreSQL provider
             .Options;
 
         return new TenantBillingDbContext(options);
@@ -24,7 +24,7 @@ public class BillingDbContextFactory
     {
         var settings = _configuration.GetSection("ConnectionStrings");
         var options = new DbContextOptionsBuilder<UserBillingDbContext>()
-            .UseSqlServer(settings["SharedBillingDb"]) // or UseNpgsql
+            .UseNpgsql(settings["SharedBillingDb"]) // or UseNpgsql
             .Options;
 
         return new UserBillingDbContext(options);

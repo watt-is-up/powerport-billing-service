@@ -9,8 +9,8 @@ public class TenantBillingDbContextFactory
     public TenantBillingDbContext CreateDbContext(string[] args)
     {
         var options = new DbContextOptionsBuilder<TenantBillingDbContext>()
-            .UseSqlServer(
-                "Server=(localdb)\\mssqllocaldb;Database=TenantBillingDb;Trusted_Connection=True;")
+            .UseNpgsql(
+                "Host=localhost;Port=5432;Database=TenantBillingDb;Username=postgres;Password=yourpassword")
             .Options;
 
         return new TenantBillingDbContext(options);
