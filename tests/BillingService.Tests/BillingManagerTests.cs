@@ -3,18 +3,21 @@ using FluentAssertions;
 using BillingService.Services;
 using BillingService.Repositories.Interfaces;
 using BillingService.Messaging.Events.Consuming;
+using BillingService.Messaging.Publishers;
 using BillingService.Models;
 using BillingService.Infrastructure.Multitenancy;
 
 public class BillingManagerTests
 {
     private readonly Mock<IBillingRepository> _repo;
+    private readonly Mock<IBillingEventPublisher> _publisher;
     private readonly BillingManager _manager;
 
     public BillingManagerTests()
     {
         _repo = new Mock<IBillingRepository>();
-        _manager = new BillingManager(_repo.Object);
+        _publisher = new Mock<IBillingEventPublisher>();
+        _manager = new BillingManager(_repo.Object, _publisher.Object);
     }
 
     [Fact]
@@ -24,9 +27,12 @@ public class BillingManagerTests
         {
             SessionId = Guid.NewGuid().ToString(),
             UserId = Guid.NewGuid().ToString(),
-            ProviderId = "provider-1",
+            ProviderId = Guid.NewGuid().ToString(),
             StartedAt = DateTime.UtcNow
         };
+
+        _repo.Setup(r => r.CreatePaymentAsync(It.IsAny<Payment>()))
+            .ReturnsAsync((Payment p) => p);
 
         await _manager.HandleSessionStarted(evt);
 
@@ -42,7 +48,6 @@ public class BillingManagerTests
     public async Task HandleSessionEnded_FinalizesPayment()
     {
         var sessionId = Guid.NewGuid();
-
         var payment = new Payment
         {
             SessionId = sessionId,
@@ -62,18 +67,17 @@ public class BillingManagerTests
         };
 
         _repo.Setup(r => r.UpdatePaymentBySessionAsync(
-            sessionId,
-            It.IsAny<Action<Payment>>()))
-        .ReturnsAsync((Guid _, Action<Payment> update) =>
-        {
-            update(payment); // IMPORTANT
-            return payment;
-        });
+                sessionId,
+                It.IsAny<Action<Payment>>()))
+            .ReturnsAsync((Guid _, Action<Payment> update) =>
+            {
+                update(payment);
+                return payment;
+            });
 
         var result = await _manager.HandleSessionEnded(evt);
 
         result.Status.Should().Be(PaymentStatus.Pending);
         result.EnergyConsumed.Should().Be(20);
     }
-
 }

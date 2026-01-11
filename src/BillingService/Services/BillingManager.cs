@@ -60,7 +60,7 @@ public class BillingManager
         if (!Guid.TryParse(startedEvent.SessionId, out var SessionId))
             throw new InvalidOperationException("Invalid SessionId");
         if (!Guid.TryParse(startedEvent.ProviderId, out var ProviderId))
-            throw new InvalidOperationException("Invalid SessionId");
+            throw new InvalidOperationException("Invalid ProviderId");
 
 
         try
