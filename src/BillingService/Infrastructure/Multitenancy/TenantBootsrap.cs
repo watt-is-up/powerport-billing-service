@@ -1,19 +1,21 @@
 using BillingService.Models;
+
+namespace BillingService.Infrastructure.Multitenancy;
 public static class TenantBootstrap
 {
     public static List<Tenant> GetMockTenants() => new()
     {
         new Tenant
         {
-            Id = "provider-a",
+            Id = "b7e6c9d1-5e7a-4c9d-8a31-1c7f2d9b8a01",
             Name = "Provider A",
-            ConnectionString = "Server=localhost;Database=Billing_ProviderA;User Id=sa;Password=Your_password123;"
+            ConnectionString = "Host=postgres-db;Port=5432;Database=provider_adb;Username=providera;Password=secretpassword"
         },
         new Tenant
         {
-            Id = "provider-b",
+            Id = "e8b1c7d6-5f4a-4e9b-8c2d-1a7f6b9e5c02",
             Name = "Provider B",
-            ConnectionString = "Server=localhost;Database=Billing_ProviderB;User Id=sa;Password=Your_password123;"
+            ConnectionString = "Host=postgres-db;Port=5432;Database=provider_bdb;Username=providerb;Password=secretpassword"
         }
     };
 }

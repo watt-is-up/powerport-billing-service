@@ -3,6 +3,7 @@ using BillingService.Models;
 public interface ITenantStore
 {
     Tenant? GetTenant(string tenantId);
+    List<Tenant> GetTenants();
 }
 
 public class InMemoryTenantStore : ITenantStore
@@ -18,5 +19,10 @@ public class InMemoryTenantStore : ITenantStore
     {
         _tenants.TryGetValue(tenantId, out var tenant);
         return tenant;
+    }
+
+    public List<Tenant> GetTenants()
+    {
+        return _tenants.Values.ToList();
     }
 }

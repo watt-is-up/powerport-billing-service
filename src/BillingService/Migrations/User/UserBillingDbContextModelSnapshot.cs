@@ -41,6 +41,9 @@ namespace BillingService.Migrations.User
                         .HasPrecision(18, 6)
                         .HasColumnType("numeric(18,6)");
 
+                    b.Property<Guid>("ProviderId")
+                        .HasColumnType("uuid");
+
                     b.Property<decimal>("Rate")
                         .HasPrecision(18, 6)
                         .HasColumnType("numeric(18,6)");
