@@ -8,6 +8,7 @@ namespace BillingService.Models
     {
         public int Id { get; set; } // Primary key, auto-incremented
         public Guid UserId { get; set; } // Who is paying
+        public Guid ProviderId { get; set; } // Who is paying
         public Guid SessionId { get; set; } // Charging session reference
         public decimal Amount { get; set; } // Calculated amount
         public DateTime SessionStarted { get; set; } // Session start

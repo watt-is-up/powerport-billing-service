@@ -19,10 +19,36 @@ public class UserBillingRepository : IBillingRepository
         return await _db.Payments.ToListAsync();
     }
 
+    public async Task<Payment?> GetPaymentBySessionAsync(Guid sessionId)
+    {
+        return await _db.Payments.SingleOrDefaultAsync(p => p.SessionId == sessionId);
+    }
+
     public async Task<Payment> CreatePaymentAsync(Payment payment)
     {
         _db.Payments.Add(payment);
         await _db.SaveChangesAsync();
         return payment;
     }
+
+    public async Task<Payment> UpdatePaymentAsync(Payment payment)
+    {
+        _db.Payments.Update(payment);
+        await _db.SaveChangesAsync();
+        return payment;
+    }
+
+    public async Task<Payment> UpdatePaymentBySessionAsync(
+        Guid sessionId,
+        Action<Payment> update)
+    {
+        var payment = await _db.Payments
+            .SingleAsync(p => p.SessionId == sessionId);
+
+        update(payment);
+
+        await _db.SaveChangesAsync();
+        return payment;
+    }
+
 }

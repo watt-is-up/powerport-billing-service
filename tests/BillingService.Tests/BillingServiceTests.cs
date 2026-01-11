@@ -2,19 +2,26 @@ using BillingService.Data;
 using BillingService.Models;
 using BillingService.Services;
 using BillingService.Repositories.User;
-
+using BillingService.Messaging.Publishers;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 
 namespace BillingService.Tests;
 
 public class BillingServiceTests
 {
+    private readonly Mock<IBillingEventPublisher> _publisher;
+
+    public BillingServiceTests()
+    {
+        _publisher = new Mock<IBillingEventPublisher>();
+    }
+
     private UserBillingDbContext GetInMemoryUserDbContext()
     {
         var options = new DbContextOptionsBuilder<UserBillingDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-
         return new UserBillingDbContext(options);
     }
 
@@ -23,7 +30,7 @@ public class BillingServiceTests
     {
         var dbContext = GetInMemoryUserDbContext();
         var repository = new UserBillingRepository(dbContext);
-        var service = new BillingManager(repository);
+        var service = new BillingManager(repository, _publisher.Object);
 
         var start = DateTime.Now;
         var end = start.AddHours(2);
@@ -41,12 +48,13 @@ public class BillingServiceTests
     {
         var dbContext = GetInMemoryUserDbContext();
         var repository = new UserBillingRepository(dbContext);
-        var service = new BillingManager(repository);
+        var service = new BillingManager(repository, _publisher.Object);
 
         await service.CreatePaymentAsync(Guid.NewGuid(), DateTime.Now, DateTime.Now.AddHours(1));
         await service.CreatePaymentAsync(Guid.NewGuid(), DateTime.Now, DateTime.Now.AddHours(2));
 
         var payments = await service.GetPaymentsAsync();
+
         Assert.Equal(2, payments.Count);
     }
 }
