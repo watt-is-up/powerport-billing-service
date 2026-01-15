@@ -17,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // 1. Register tenant store (In-memory for now; replace with user service API later)
 builder.Services.AddSingleton<ITenantStore>(_ =>
-    new InMemoryTenantStore(TenantBootstrap.GetMockTenants()));
+    new InMemoryTenantStore(TenantBootstrap.LoadFromConfiguration(builder.Configuration)));
 
 // Tenant DbContexts will be created dynamically via BillingDbContextFactory
 builder.Services.AddSingleton<BillingDbContextFactory>();
@@ -63,8 +63,8 @@ using (var scope = app.Services.CreateScope())
 
     try
     {
-        var userDb = factory.CreateUserDbContext();
-        userDb.Database.Migrate();
+        // var userDb = factory.CreateUserDbContext();
+        // userDb.Database.Migrate();
 
         foreach(Tenant tenant in tenantStore.GetTenants())
         {

@@ -4,6 +4,7 @@ using System.Text.Json;
 using BillingService.Messaging.Events.Consuming;
 using BillingService.Messaging.Events;
 using BillingService.Services.Interfaces;
+using BillingService.Services.Multitenancy;
 
 namespace BillingService.Messaging.Consumers;
 
@@ -12,15 +13,18 @@ public class ChargingSessionConsumer : BackgroundService
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IConfiguration _configuration;
     private readonly ILogger<ChargingSessionConsumer> _logger;
+    private readonly ITenantResolver _tenantResolver;
 
     public ChargingSessionConsumer(
         IServiceScopeFactory scopeFactory,
         IConfiguration configuration,
-        ILogger<ChargingSessionConsumer> logger)
+        ILogger<ChargingSessionConsumer> logger,
+        ITenantResolver tenantResolver)
     {
         _scopeFactory = scopeFactory;
         _configuration = configuration;
         _logger = logger;
+        _tenantResolver = tenantResolver;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -47,6 +51,7 @@ public class ChargingSessionConsumer : BackgroundService
 
                 if (string.IsNullOrWhiteSpace(result.Message.Value))
                 {
+                    _logger.LogWarning("Received empty message from Kafka, skipping.");
                     // skip empty messages (console producer sends them)
                     continue;
                 }
@@ -82,11 +87,13 @@ public class ChargingSessionConsumer : BackgroundService
         }
     }
 
-    private static async Task HandleEvent(
+    private async Task HandleEvent(
         EventEnvelope<JsonElement> envelope,
         IBillingManagerFactory factory)
     {
-
+        _logger.LogInformation("Processing {EventType} for key {Key}", envelope.EventType, envelope.Key);
+        var sharedTenant = _tenantResolver.GetSharedTenant();
+        
         switch (envelope.EventType)
         {
             case "ChargingSessionStarted":
@@ -94,8 +101,11 @@ public class ChargingSessionConsumer : BackgroundService
                 await factory.GetManagerForTenant(started.ProviderId)
                             .HandleSessionStarted(started);
 
-                await factory.GetManagerForUser()
+                if (sharedTenant == null) throw new Exception("Shared tenant not found");
+                await factory.GetManagerForTenant(sharedTenant.Id)
                             .HandleSessionStarted(started);
+                // await factory.GetManagerForUser()
+                //             .HandleSessionStarted(started);
                 break;
 
             case "ChargingSessionUpdated":
@@ -103,18 +113,31 @@ public class ChargingSessionConsumer : BackgroundService
                 await factory.GetManagerForTenant(update.ProviderId)
                             .HandleSessionUpdate(update);
 
-                await factory.GetManagerForUser()
+                if (sharedTenant == null) throw new Exception("Shared tenant not found");
+                await factory.GetManagerForTenant(sharedTenant.Id)
                             .HandleSessionUpdate(update);
+
+                // await factory.GetManagerForUser()
+                //             .HandleSessionUpdate(update);
                 break;
 
             case "ChargingSessionEnded":
                 var ended = envelope.Payload.Deserialize<ChargingSessionEnded>()!;
                 await factory.GetManagerForTenant(ended.ProviderId)
                             .HandleSessionEnded(ended);
-
-                await factory.GetManagerForUser()
+                
+                if (sharedTenant == null) throw new Exception("Shared tenant not found");
+                await factory.GetManagerForTenant(sharedTenant.Id)
                             .HandleSessionEnded(ended);
+                // await factory.GetManagerForUser()
+                //             .HandleSessionEnded(ended);
                 break;
+
+            default:
+                _logger.LogWarning("Unknown event type: {EventType}", envelope.EventType);
+                return;
         }
+
+        _logger.LogInformation("Successfully processed {EventType} for key {Key}", envelope.EventType, envelope.Key);
     }
 }

@@ -34,20 +34,12 @@ public class BillingManagerFactory : IBillingManagerFactory
 
         return new BillingManager(repo, publisher);
 
-        // DbContext dbContext = tenant != null
-        //     ? _sp.GetRequiredService<BillingDbContextFactory>().CreateTenantDbContext(tenant)
-        //     : _sp.GetRequiredService<BillingDbContextFactory>().CreateUserDbContext();
-        
-        // IBillingRepository repo = tenant != null
-        //     ? new TenantBillingRepository((TenantBillingDbContext) dbContext)
-        //     : new UserBillingRepository((UserBillingDbContext) dbContext);
-
     }
 
-    public BillingManager GetManagerForUser()
-    {
-        var dbContext = _sp.GetRequiredService<BillingDbContextFactory>().CreateUserDbContext();
-        var publisher = _sp.GetRequiredService<IBillingEventPublisher>();
-        return new BillingManager(new UserBillingRepository(dbContext), publisher);
-    }
+    // public BillingManager GetManagerForUser()
+    // {
+    //     var dbContext = _sp.GetRequiredService<BillingDbContextFactory>().CreateUserDbContext();
+    //     var publisher = _sp.GetRequiredService<IBillingEventPublisher>();
+    //     return new BillingManager(new UserBillingRepository(dbContext), publisher);
+    // }
 }

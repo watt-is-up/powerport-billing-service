@@ -20,13 +20,13 @@ public class BillingDbContextFactory
         return new TenantBillingDbContext(options);
     }
 
-    public UserBillingDbContext CreateUserDbContext()
-    {
-        var settings = _configuration.GetSection("ConnectionStrings");
-        var options = new DbContextOptionsBuilder<UserBillingDbContext>()
-            .UseNpgsql(settings["SharedBillingDb"]) // or UseNpgsql
-            .Options;
+    // public UserBillingDbContext CreateUserDbContext()
+    // {
+    //     var settings = _configuration.GetSection("ConnectionStrings");
+    //     var options = new DbContextOptionsBuilder<UserBillingDbContext>()
+    //         .UseNpgsql(settings["SharedBillingDb"]) // or UseNpgsql
+    //         .Options;
 
-        return new UserBillingDbContext(options);
-    }
+    //     return new UserBillingDbContext(options);
+    // }
 }

@@ -6,6 +6,7 @@ namespace BillingService.Services.Multitenancy
     {
         Tenant? GetTenant(HttpContext context);
         Tenant? GetTenant(string tenantId);
+        Tenant GetSharedTenant();
     }
 
     public class TenantResolver : ITenantResolver
@@ -20,12 +21,17 @@ namespace BillingService.Services.Multitenancy
         public Tenant? GetTenant(HttpContext context)
         {
             var tenantId = context.Request.Headers["X-Tenant-Id"].FirstOrDefault();
-            return tenantId == null ? null : _tenantStore.GetTenant(tenantId);
+            return tenantId == null ? _tenantStore.GetSharedTenant() : _tenantStore.GetTenant(tenantId);
         }
 
         public Tenant? GetTenant(string tenantId)
         {
             return _tenantStore.GetTenant(tenantId);
+        }
+
+        public Tenant GetSharedTenant()
+        {
+            return _tenantStore.GetSharedTenant();
         }
     }
 }

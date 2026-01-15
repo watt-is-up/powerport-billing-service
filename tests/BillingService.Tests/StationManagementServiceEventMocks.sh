@@ -12,7 +12,7 @@ kafka-console-producer \
 {"EventId":"1a7d9c4b-6f2e-4e8a-9c5d-3b7f1e6a2c06","EventType":"ChargingSessionEnded","EventVersion":1,"OccurredAt":"2026-01-09T12:00:00Z","Producer":"station-management-service","Key":"9f1c6a2d-8b7e-4f3a-9e5c-2a1b7d6c4e02","Payload":{"SessionId":"9f1c6a2d-8b7e-4f3a-9e5c-2a1b7d6c4e02","ProviderId":"e8b1c7d6-5f4a-4e9b-8c2d-1a7f6b9e5c02","TotalEnergyKwh":18.95,"EndedAt":"2026-01-09T12:00:00Z"}}
 EOF
 
-
+kafka-topics --bootstrap-server kafka:9092 --delete --topic charging-session.events
 kafka-consumer-groups --bootstrap-server kafka:9092 --describe --group billing-service
 kafka-console-consumer \
   --bootstrap-server kafka:9092 \

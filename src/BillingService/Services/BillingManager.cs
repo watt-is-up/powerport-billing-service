@@ -3,7 +3,6 @@ using BillingService.Repositories.Interfaces;
 using BillingService.Messaging.Events.Consuming;
 using BillingService.Messaging.Events.Emitting;
 using BillingService.Messaging.Publishers;
-using BillingService.Data.Migrations.Tenant;
 
 
 namespace BillingService.Services;
@@ -67,9 +66,7 @@ public class BillingManager
         {
             var inDbPayment = await _repository.GetPaymentBySessionAsync(SessionId);
             if (inDbPayment != null)
-            {
                 return null;
-            }
 
             var payment = new Payment
             {
@@ -97,9 +94,7 @@ public class BillingManager
         {
             var payment = await _repository.GetPaymentBySessionAsync(SessionId);
             if (payment == null)
-            {
                 return null;
-            }
 
             return await _repository.UpdatePaymentBySessionAsync(
                 SessionId,
@@ -122,13 +117,13 @@ public class BillingManager
 
         try
         {
-            var payment = await _repository.GetPaymentBySessionAsync(SessionId);
-            if (payment == null)
-            {   
+            var pendingPayment = await _repository.GetPaymentBySessionAsync(SessionId);
+            if (pendingPayment == null)
                 return null;
-            }
-            
-            var amount = await CalculatePaymentAmount(payment);
+
+            pendingPayment.SessionEnded = endedEvent.EndedAt;
+            var amount = await CalculatePaymentAmount(pendingPayment);
+
             return await _repository.UpdatePaymentBySessionAsync(
                 SessionId,
                 p =>
