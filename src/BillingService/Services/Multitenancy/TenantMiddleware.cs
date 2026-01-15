@@ -1,4 +1,3 @@
-using BillingService.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace BillingService.Services.Multitenancy
@@ -24,7 +23,9 @@ namespace BillingService.Services.Multitenancy
             if (tenant == null)
             {
                 // Normal user → shared DB
-                dbContext = factory.CreateUserDbContext();
+                // dbContext = factory.CreateUserDbContext();
+                throw new InvalidOperationException(
+                    "No tenant found for the request");
             }
             else
             {
