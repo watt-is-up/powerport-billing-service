@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using HealthChecks.NpgSql;
 using System.Text.Json;  
+using System.Reflection;
 
 
 
@@ -55,7 +56,13 @@ builder.Services.AddControllers();
 
 // 5. Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
+
+});
 
 // Add health checks
 builder.Services.AddHealthChecks()
@@ -114,11 +121,15 @@ app.UseTenantMiddleware();
 
 //
 // -------------------- Configure Request Pipeline --------------------
-if (app.Environment.IsDevelopment())
+/* if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+} */
+
+// add Swagger to not development too
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // configure health endpoints
 app.MapHealthChecks("/health/live", new HealthCheckOptions

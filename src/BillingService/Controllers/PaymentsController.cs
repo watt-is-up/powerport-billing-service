@@ -27,6 +27,10 @@ public class PaymentsController : ControllerBase
         _billingManager = new BillingManager(repository, publisher);
     }
 
+    /// <summary>
+    /// Get all payments
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     public async Task<IActionResult> GetPayments()
     {
@@ -34,6 +38,11 @@ public class PaymentsController : ControllerBase
         return Ok(payments);
     }
 
+    /// <summary>
+    /// Adds a new payment
+    /// </summary>
+    /// <param name="payment">The object determining the payment</param>
+    /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> AddPayment([FromBody] Payment payment)
     {
@@ -41,6 +50,11 @@ public class PaymentsController : ControllerBase
         return CreatedAtAction(nameof(GetPayments), new { id = createdPayment.Id }, createdPayment);
     }
 
+    /// <summary>
+    /// API endpoint for finalising the payment
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost("finalize")]
     public async Task<IActionResult> FinalizePayment([FromBody] FinalizePaymentRequest request)
     {
