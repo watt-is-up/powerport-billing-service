@@ -6,6 +6,13 @@ using BillingService.Services.Interfaces;
 using BillingService.Models;
 using Microsoft.EntityFrameworkCore;
 using Confluent.Kafka;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using HealthChecks.NpgSql;
+using System.Text.Json;  
 
 
 
@@ -49,6 +56,17 @@ builder.Services.AddControllers();
 // 5. Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add health checks
+builder.Services.AddHealthChecks()
+    .AddCheck(
+        "self",
+        () => HealthCheckResult.Healthy(),
+        tags: new[] { "live "})
+    .AddNpgSql(
+        builder.Configuration.GetConnectionString("BillingDb"),
+        tags: new[] { "ready" }
+    );
 
 //
 // -------------------- Build App --------------------
@@ -102,9 +120,45 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// configure health endpoints
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = r => r.Tags.Contains("live"),
+    ResponseWriter = WriteHealthResponse
+})
+.WithTags("Health")
+.AllowAnonymous();
+
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = r => r.Tags.Contains("ready"),
+    ResponseWriter = WriteHealthResponse
+})
+.WithTags("Health")
+.AllowAnonymous();
+
 // Map controllers to endpoints
 app.MapControllers();
 
 //
 // -------------------- Run App --------------------
 app.Run();
+
+
+static Task WriteHealthResponse(HttpContext context, HealthReport report)
+{
+    context.Response.ContentType = "application/json";
+
+    var result = JsonSerializer.Serialize(new
+    {
+        status = report.Status.ToString(),
+        checks = report.Entries.Select(e => new
+        {
+            name = e.Key,
+            status = e.Value.Status.ToString(),
+            description = e.Value.Description
+        })
+    });
+
+    return context.Response.WriteAsync(result);
+}
